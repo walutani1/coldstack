@@ -1,10 +1,11 @@
-// Point the Smartlead EMAIL_REPLY webhook for both campaigns at this app.
-// Upserts by webhook name (also migrates the old tunnel-era "Clay reply intake"
-// registration instead of creating duplicates).
+// Point Smartlead EMAIL_REPLY webhooks at this app. Upserts by webhook name
+// (also migrates registrations left by older deployments instead of creating
+// duplicates). Run with no campaign ids to list your campaigns first.
 //
 // Usage:
-//   node scripts/register-smartlead-webhook.mjs [https://your-deployment.vercel.app]
-//   (defaults to APP_BASE_URL from .env.local)
+//   node scripts/register-smartlead-webhook.mjs <base-url> <campaignId> [campaignId...]
+//   node scripts/register-smartlead-webhook.mjs <base-url>        # lists campaigns
+//   (base-url defaults to APP_BASE_URL from .env.local)
 import { loadEnv } from "./_env.mjs";
 
 const { merged } = loadEnv();
@@ -13,15 +14,13 @@ const API_KEY = merged.SMARTLEAD_API_KEY;
 const SECRET = merged.SMARTLEAD_WEBHOOK_SECRET;
 const BASE = merged.SMARTLEAD_API_BASE_URL || "https://server.smartlead.ai/api/v1";
 
-const CAMPAIGNS = [
-  { id: 3566006, name: "Manufacturing Operations Senior/Managers" },
-  { id: 3588358, name: "Manufacturing Operations Directors" },
-];
+const WEBHOOK_NAME = "Coldstack reply intake";
+const LEGACY_NAMES = ["Scaling Inbox reply intake", "Clay reply intake"];
 
-const WEBHOOK_NAME = "Scaling Inbox reply intake";
-const LEGACY_NAMES = ["Clay reply intake"];
-
-const publicUrl = (process.argv[2] || merged.APP_BASE_URL || "").replace(/\/$/, "");
+const args = process.argv.slice(2);
+const urlArg = args[0] && !/^\d+$/.test(args[0]) ? args[0] : null;
+const campaignIds = args.filter((arg) => /^\d+$/.test(arg)).map(Number);
+const publicUrl = (urlArg || merged.APP_BASE_URL || "").replace(/\/$/, "");
 
 async function api(path, init) {
   const url = new URL(`${BASE}${path}`);
@@ -41,7 +40,16 @@ async function main() {
   if (!API_KEY) throw new Error("Missing SMARTLEAD_API_KEY.");
   if (!SECRET) throw new Error("Missing SMARTLEAD_WEBHOOK_SECRET.");
   if (!publicUrl || publicUrl.includes("localhost")) {
-    throw new Error("Pass the deployed base URL, e.g. node scripts/register-smartlead-webhook.mjs https://your-app.vercel.app");
+    throw new Error("Pass the deployed base URL, e.g. node scripts/register-smartlead-webhook.mjs https://your-app.vercel.app 1234567");
+  }
+
+  if (campaignIds.length === 0) {
+    const campaignsRes = await api("/campaigns");
+    const campaigns = Array.isArray(campaignsRes.json) ? campaignsRes.json : [];
+    if (campaigns.length === 0) throw new Error("Could not fetch campaigns from Smartlead.");
+    console.log("Pass one or more campaign ids to register. Your campaigns:\n");
+    for (const campaign of campaigns) console.log(`  ${campaign.id}  ${campaign.name}`);
+    return;
   }
 
   const webhookUrl = `${publicUrl}/api/webhooks/smartlead?secret=${encodeURIComponent(SECRET)}`;
@@ -54,12 +62,12 @@ async function main() {
     .filter(Boolean);
   if (allCategories.length === 0) throw new Error("Could not fetch Smartlead reply categories.");
 
-  for (const campaign of CAMPAIGNS) {
-    const existing = await api(`/campaigns/${campaign.id}/webhooks`);
+  for (const campaignId of campaignIds) {
+    const existing = await api(`/campaigns/${campaignId}/webhooks`);
     const list = Array.isArray(existing.json) ? existing.json : [];
     const match = list.find((w) => [WEBHOOK_NAME, ...LEGACY_NAMES].includes(w?.name));
 
-    const result = await api(`/campaigns/${campaign.id}/webhooks`, {
+    const result = await api(`/campaigns/${campaignId}/webhooks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -72,7 +80,7 @@ async function main() {
     });
 
     console.log(
-      `[${campaign.name}] ${match ? `updated webhook #${match.id}` : "created webhook"} -> ${result.status} ${JSON.stringify(result.json).slice(0, 160)}`,
+      `[campaign ${campaignId}] ${match ? `updated webhook #${match.id}` : "created webhook"} -> ${result.status} ${JSON.stringify(result.json).slice(0, 160)}`,
     );
   }
 

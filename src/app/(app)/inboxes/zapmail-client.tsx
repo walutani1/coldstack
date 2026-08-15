@@ -1999,7 +1999,7 @@ function InboxesStep({
             <input
               value={bulkLast}
               onChange={(event) => onBulkLast(event.target.value)}
-              placeholder="Amole"
+              placeholder="Smith"
               className={`${INPUT_CLASS} w-36`}
             />
           </label>

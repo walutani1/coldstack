@@ -1204,11 +1204,11 @@ function SearchEditor({
       </div>
       <label className="flex flex-col gap-1">
         <span className="text-[11px] font-medium text-muted-foreground">Name</span>
-        <input value={form.name} disabled={pending !== null} onChange={(event) => set("name", event.target.value)} placeholder="e.g. Automation roles — manufacturing" className={INPUT_CLASS} />
+        <input value={form.name} disabled={pending !== null} onChange={(event) => set("name", event.target.value)} placeholder="e.g. Support ops roles — e-commerce" className={INPUT_CLASS} />
       </label>
       <div className="flex flex-col gap-1">
         <span className="text-[11px] font-medium text-muted-foreground">Job titles</span>
-        <TagInput value={form.jobTitles} onChange={(next) => set("jobTitles", next.slice(0, 20))} placeholder="Controls Engineer, Process Automation…  (Enter adds)" disabled={pending !== null} ariaLabel="Job titles" />
+        <TagInput value={form.jobTitles} onChange={(next) => set("jobTitles", next.slice(0, 20))} placeholder="Support Operations, Help Desk Admin…  (Enter adds)" disabled={pending !== null} ariaLabel="Job titles" />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-1">
@@ -1489,7 +1489,7 @@ function ConfigDrawer({
                   <TagInput value={form.industries.blocked} onChange={(next) => setForm((prev) => ({ ...prev, industries: { ...prev.industries, blocked: next.slice(0, 50) } }))} placeholder="Staffing and Recruiting, …" disabled={false} ariaLabel="Blocked industries" />
                 </ConfigField>
                 <ConfigField label="Preferred industries" hint="Boosts the industry-fit factor; everything not blocked still flows through.">
-                  <TagInput value={form.industries.preferred} onChange={(next) => setForm((prev) => ({ ...prev, industries: { ...prev.industries, preferred: next.slice(0, 50) } }))} placeholder="Manufacturing, Logistics, …" disabled={false} ariaLabel="Preferred industries" />
+                  <TagInput value={form.industries.preferred} onChange={(next) => setForm((prev) => ({ ...prev, industries: { ...prev.industries, preferred: next.slice(0, 50) } }))} placeholder="Retail, E-commerce, …" disabled={false} ariaLabel="Preferred industries" />
                 </ConfigField>
                 <ConfigField label="Evidence" hint="Postings older than the window stop counting; the top N descriptions feed JD scoring.">
                   <div className="grid grid-cols-2 gap-3">
@@ -1512,11 +1512,11 @@ function ConfigDrawer({
                   <textarea value={form.prompts.agency} onChange={(event) => setForm((prev) => ({ ...prev, prompts: { ...prev.prompts, agency: event.target.value } }))} rows={4} className={TEXTAREA_CLASS} />
                   <ModelSelect label="Model" value={form.models.agency} onChange={(next) => setForm((prev) => ({ ...prev, models: { ...prev.models, agency: next } }))} />
                 </ConfigField>
-                <ConfigField label="Title gate" hint="Runs before research so noise dies cheaply. Kills when no posting title is a valid automation/modernization role. When unsure, it kills (precision bias).">
+                <ConfigField label="Title gate" hint="Runs before research so noise dies cheaply. Kills when no posting title is a valid signal role per the studio context. When unsure, it kills (precision bias).">
                   <textarea value={form.prompts.titleGate} onChange={(event) => setForm((prev) => ({ ...prev, prompts: { ...prev.prompts, titleGate: event.target.value } }))} rows={4} className={TEXTAREA_CLASS} />
                   <ModelSelect label="Model" value={form.models.titleGate} onChange={(next) => setForm((prev) => ({ ...prev, models: { ...prev.models, titleGate: next } }))} />
                 </ConfigField>
-                <ConfigField label="JD scoring" hint="Reads the valid-title job descriptions and scores industry fit, title strength, and modernization signals.">
+                <ConfigField label="JD scoring" hint="Reads the valid-title job descriptions and scores industry fit, title strength, and signal evidence.">
                   <textarea value={form.prompts.jdScoring} onChange={(event) => setForm((prev) => ({ ...prev, prompts: { ...prev.prompts, jdScoring: event.target.value } }))} rows={4} className={TEXTAREA_CLASS} />
                   <ModelSelect label="Model" value={form.models.jdScoring} onChange={(next) => setForm((prev) => ({ ...prev, models: { ...prev.models, jdScoring: next } }))} />
                 </ConfigField>

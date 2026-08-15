@@ -2859,7 +2859,7 @@ function WorkspaceSection({
           <input
             value={form.tagline}
             onChange={(event) => set("tagline", event.target.value)}
-            placeholder="Reply review portal"
+            placeholder="Cold email workspace"
             maxLength={120}
             className={INPUT_CLASS}
           />

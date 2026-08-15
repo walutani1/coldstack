@@ -498,7 +498,7 @@ export async function stageTitleGate(
     stage: "title_gate",
     verdict: valid ? "pass" : "kill",
     output: { validTitles },
-    rationale: str(result.parsed.rationale, 800) || (valid ? "At least one valid automation/modernization title." : "No valid titles."),
+    rationale: str(result.parsed.rationale, 800) || (valid ? "At least one valid signal title." : "No valid titles."),
     rawText: result.rawText,
     model: config.models.titleGate,
     inputTokens: result.inputTokens,

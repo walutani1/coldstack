@@ -65,10 +65,10 @@ const GENERAL_LEADERS: { score: number; label: string; pattern: RegExp }[] = [
   { score: 60, label: "Other C-level", pattern: /\b(chief\s+\w+\s+officer|cro|cco|cmo)\b/i },
 ];
 
-// Departments a modernization hire lands in. Whoever runs one of these owns
-// the pain the posting describes, so they outrank the top executive: at a
-// 50-100 person company the ops or systems lead lives the manual process
-// daily, while the CEO is a layer removed (operator call, 2026-07-27).
+// Departments the posted role typically lands in. Whoever runs one of these
+// owns the pain the posting describes, so they outrank the top executive: at
+// an SMB the department lead lives the problem daily, while the CEO is a
+// layer removed.
 const DOMAINS: { key: string; label: string; pattern: RegExp }[] = [
   // "operating"/"information officer" matter: without them a COO or CIO falls
   // through to the generic C-level tier instead of ranking as the head of the
@@ -121,7 +121,7 @@ export function rankContact(title: string | null, validTitles: string[]): { scor
   if (!text) return { score: 0, reason: "No title on the profile.", excluded: null };
   if (EXCLUDE_PATTERN.test(text)) return { score: 0, reason: "HR / recruiting", excluded: "HR or recruiting role — never a target." };
   if (matchesPostedRole(text, validTitles)) {
-    return { score: 0, reason: "Matches posted role", excluded: "Title matches the posted modernization role — likely the hire itself." };
+    return { score: 0, reason: "Matches posted role", excluded: "Title matches the posted signal role — likely the hire itself." };
   }
 
   const domain = DOMAINS.find((entry) => entry.pattern.test(text)) ?? null;

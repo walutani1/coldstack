@@ -1,6 +1,7 @@
 // Shared env loader for setup scripts. Loads this app's .env.local first,
-// then fills gaps from the Clay workspace's .env.local (source of truth for
-// shared credentials). Never prints values.
+// then optionally fills gaps from a sibling "Clay" workspace's .env.local
+// (legacy shared-credentials location; skipped when absent). Never prints
+// values.
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";

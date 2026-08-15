@@ -6,6 +6,7 @@ import { getSecret } from "@/lib/secrets";
 import { AI_GATEWAY_DEFAULT_BASE_URL } from "@/lib/enrichment/llm-runner";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { firecrawlScrape, firecrawlSearch, type WebSearchResult } from "@/lib/signals/firecrawl";
+import { getActiveFunnelConfig } from "@/lib/signals/config";
 import { COMPANY_COLUMNS, toCompanyDto } from "@/lib/signals/store";
 import type { SignalCompanyDto } from "@/lib/signals/types";
 
@@ -40,14 +41,17 @@ function buildPrompt(input: {
   hiringTitles: string[];
   homepage: string;
   snippets: WebSearchResult[];
+  studioContext: string;
 }): string {
   const snippetBlock = input.snippets
     .slice(0, 6)
     .map((s) => `- ${s.title ?? s.url} (${s.url})${s.description ? `: ${s.description.slice(0, 300)}` : ""}`)
     .join("\n");
   return [
-    "You are a sales researcher for an agency that implements automation and AI for established, operations-heavy businesses (manufacturing, logistics, distribution — companies that could benefit from modernizing but often haven't gotten around to it).",
-    "Our outreach hook: when a company posts a job for an automation/modernization role, we offer to build part of that work for them (sometimes free as a pilot) — often before they finish hiring for it.",
+    "You are a sales researcher for the business described in the studio context below. Our outreach hook: when a company posts a job matching the context's hiring signal, we reach out and offer to deliver part of that work — often before they finish hiring for it.",
+    "",
+    "Studio context:",
+    input.studioContext.slice(0, 2_500),
     "",
     `Research subject: ${input.name}`,
     input.industries ? `LinkedIn industry: ${input.industries}` : "",
@@ -63,7 +67,7 @@ function buildPrompt(input: {
     "Write a concise research brief in markdown. Use exactly these ### sections:",
     "### What they do",
     "### Scale & operations",
-    "### Modernization signals",
+    "### Signal evidence",
     "### Why the hiring signal matters",
     "### Outreach angle",
     "Rules: under 350 words total. Only state facts supported by the material above; say \"unknown\" rather than invent. The outreach angle must reference the specific role(s) they are hiring for. No preamble, start directly with the first section header.",
@@ -170,6 +174,7 @@ export async function runCompanyResearch(companyId: string): Promise<ResearchOut
       throw new Error("No web material found: search returned nothing and the website could not be scraped.");
     }
 
+    const { config } = await getActiveFunnelConfig();
     const brief = await completeBrief(
       RESEARCH_MODEL,
       buildPrompt({
@@ -179,6 +184,7 @@ export async function runCompanyResearch(companyId: string): Promise<ResearchOut
         hiringTitles,
         homepage,
         snippets,
+        studioContext: config.studioContext,
       }),
     );
     if (!brief) throw new Error("The model returned an empty brief.");
