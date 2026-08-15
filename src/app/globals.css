@@ -1,0 +1,412 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============ Brentwood design tokens ============ */
+/* Neutral roles: surface-muted = large recessed tint (headers, toolbars, rails);
+   muted = small control fills only (chips, segmented controls, input wells);
+   surface-elevated = floating brightest layer (menus, popovers, toasts) — pops via shadow-pop, never tint. */
+:root {
+  --background: #f4f4f2;
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --surface-muted: #eeeeec;
+  --foreground: #0a0a0a;
+  --foreground-subtle: #7c818a;
+  --muted: #f0f0ee;
+  --muted-foreground: #5f636c;
+  --subtle: #fafaf9;
+  --border: #dcdcda;
+  --border-strong: #c9c9c7;
+  --primary: #0a0a0a;
+  --primary-foreground: #fafafa;
+  --primary-soft: #eaf3ee;
+  --secondary: #f1f1f0;
+  --secondary-foreground: #18181b;
+  --accent: #ecf3ef;
+  --accent-foreground: #0f4332;
+  --destructive: #b91c1c;
+  --destructive-soft: #fee2e2;
+  --warning: #b45309;
+  --warning-soft: #fef3c7;
+  --success: #15803d;
+  --success-soft: #dcfce7;
+  --info: #1d4ed8;
+  --info-soft: #dbeafe;
+  --ring: #3f3f46;
+  /* Hashed avatar/tag tones — six pairs, referenced by TONE_CLASS in the inbox.
+     Kept as tokens (not literal hex in TSX) so both themes stay in one place. */
+  --tone-emerald-bg: #ecfdf5;
+  --tone-emerald-fg: #047857;
+  --tone-amber-bg: #fffbeb;
+  --tone-amber-fg: #b45309;
+  --tone-sky-bg: #f0f9ff;
+  --tone-sky-fg: #0369a1;
+  --tone-violet-bg: #f5f3ff;
+  --tone-violet-fg: #6d28d9;
+  --tone-rose-bg: #fff1f2;
+  --tone-rose-fg: #be123c;
+  --tone-teal-bg: #f0fdfa;
+  --tone-teal-fg: #0f766e;
+  --shadow-xs: 0 1px 1px rgb(16 24 40 / 0.04);
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.05), 0 1px 3px rgb(16 24 40 / 0.04);
+  --shadow-pop: 0 12px 32px -8px rgb(16 24 40 / 0.12), 0 4px 12px -4px rgb(16 24 40 / 0.06);
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.dark {
+  --background: #0a0a0a;
+  --surface: #131313;
+  --surface-elevated: #181818;
+  --surface-muted: #202020;
+  --foreground: #f4f4f4;
+  --foreground-subtle: #6b7078;
+  --muted: #1c1c1c;
+  --muted-foreground: #9ca3af;
+  --subtle: #111111;
+  --border: #2a2a2a;
+  --border-strong: #3a3a3a;
+  --primary: #f4f4f4;
+  --primary-foreground: #0a0a0a;
+  --primary-soft: #112a22;
+  --secondary: #1c1c1c;
+  --secondary-foreground: #f4f4f4;
+  --accent: #182721;
+  --accent-foreground: #86efac;
+  --destructive: #dc2626;
+  --destructive-soft: #3a1212;
+  --warning: #f59e0b;
+  --warning-soft: #2d1f0a;
+  --success: #34d399;
+  --success-soft: #0a2818;
+  --info: #60a5fa;
+  --info-soft: #0c1d3a;
+  --ring: #a1a1aa;
+  --tone-emerald-bg: rgb(2 44 34 / 0.6);
+  --tone-emerald-fg: #6ee7b7;
+  --tone-amber-bg: rgb(69 26 3 / 0.6);
+  --tone-amber-fg: #fcd34d;
+  --tone-sky-bg: rgb(8 47 73 / 0.6);
+  --tone-sky-fg: #7dd3fc;
+  --tone-violet-bg: rgb(46 16 101 / 0.6);
+  --tone-violet-fg: #c4b5fd;
+  --tone-rose-bg: rgb(76 5 25 / 0.6);
+  --tone-rose-fg: #fda4af;
+  --tone-teal-bg: rgb(4 47 46 / 0.6);
+  --tone-teal-fg: #5eead4;
+  --shadow-xs: 0 1px 1px rgb(0 0 0 / 0.4);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-pop: 0 12px 32px -8px rgb(0 0 0 / 0.6);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-muted: var(--surface-muted);
+  --color-subtle: var(--subtle);
+  --color-foreground: var(--foreground);
+  --color-foreground-subtle: var(--foreground-subtle);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-ring: var(--ring);
+
+  --color-tone-emerald-bg: var(--tone-emerald-bg);
+  --color-tone-emerald-fg: var(--tone-emerald-fg);
+  --color-tone-amber-bg: var(--tone-amber-bg);
+  --color-tone-amber-fg: var(--tone-amber-fg);
+  --color-tone-sky-bg: var(--tone-sky-bg);
+  --color-tone-sky-fg: var(--tone-sky-fg);
+  --color-tone-violet-bg: var(--tone-violet-bg);
+  --color-tone-violet-fg: var(--tone-violet-fg);
+  --color-tone-rose-bg: var(--tone-rose-bg);
+  --color-tone-rose-fg: var(--tone-rose-fg);
+  --color-tone-teal-bg: var(--tone-teal-bg);
+  --color-tone-teal-fg: var(--tone-teal-fg);
+
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-pop: var(--shadow-pop);
+
+  --ease-premium: var(--ease-premium);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* legacy aliases — remove after full migration */
+  --color-surface-2: var(--muted);
+  --color-surface-3: var(--secondary);
+  --color-faint: color-mix(in srgb, var(--muted-foreground) 70%, transparent);
+  --color-accent-strong: var(--primary);
+  --color-accent-soft: var(--accent);
+  --color-positive: var(--success);
+  --color-positive-soft: var(--success-soft);
+  --color-negative: var(--destructive);
+  --color-negative-soft: var(--destructive-soft);
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop {
+    border-color: var(--border);
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  ::selection {
+    background: var(--accent);
+  }
+
+  /* Tailwind v4 dropped the browser default cursor:pointer on <button>,
+     so restore it (and other native interactive controls) app-wide. */
+  button:not(:disabled), [role="button"]:not(:disabled), select:not(:disabled), summary { cursor: pointer; }
+  button:disabled, select:disabled { cursor: not-allowed; }
+
+  /* One app-wide keyboard focus ring, so no component has to re-declare it.
+     Lives in @layer base, so a deliberate `outline-none` utility on a control
+     with its own focus treatment (inputs use focus:border-ring) still wins. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* ── Styled tooltips ───────────────────────────────────────────────────────
+   Replaces browser-default title bubbles: put the copy in data-tip (and keep
+   an aria-label for icon-only controls). Inverse-surface bubble, 300ms hover
+   intent, no motion beyond an opacity settle. data-tip-down flips below for
+   triggers near the top edge. Clipped ancestors (overflow-hidden) will crop
+   these; keep native title there instead. */
+[data-tip] {
+  position: relative;
+}
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%);
+  z-index: 60;
+  width: max-content;
+  max-width: 260px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 100ms ease, visibility 0s linear 300ms;
+}
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 300ms;
+}
+[data-tip-down]::after {
+  bottom: auto;
+  top: calc(100% + 6px);
+}
+/* Right-edge triggers: align the bubble's right edge to the trigger instead
+   of centering, so it can't run past the viewport. */
+[data-tip-end]::after {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-tip]::after {
+    transition: none;
+  }
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Slim, theme-aware scrollbars for the three-pane layout. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Opt-in overlay scrollbar that only reveals its thumb on hover (per mockup). */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.scroll-thin:hover {
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.scroll-thin::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+.scroll-thin:hover::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+/* ── Collapsible sidebar ──────────────────────────────────────────────
+   html.si-rail (set pre-paint from localStorage "si-sidebar") collapses
+   the app sidebar to a 64px icon rail. CSS-driven so server markup never
+   changes and there is no hydration flash. */
+.app-sidebar {
+  width: 232px;
+  transition: width 200ms var(--ease-premium);
+}
+.si-rail .app-sidebar {
+  width: 64px;
+}
+.si-rail .app-sidebar .rail-hide {
+  display: none;
+}
+.rail-only {
+  display: none;
+}
+.si-rail .app-sidebar .rail-only {
+  display: flex;
+}
+.si-rail .app-sidebar .rail-item {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+.si-rail .app-sidebar .rail-badge {
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  margin-left: 0;
+}
+.si-rail .app-sidebar .theme-seg {
+  flex-direction: column;
+}
+.si-rail .app-sidebar .user-row {
+  flex-direction: column;
+}
+
+/* ── App motion system ────────────────────────────────────────────────
+   Minimal premium SaaS motion. Opacity/transform only, so both themes are
+   unaffected. Every animation ends at transform:none, leaving no persistent
+   transform behind (fixed-position menus and sticky elements depend on it).
+   Plain, unlayered CSS so it always wins over Tailwind's layered utilities. */
+@keyframes si-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes si-overlay-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes si-panel-in {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes si-panel-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: scale(0.985); }
+}
+@keyframes si-menu-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes si-drawer-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes si-drawer-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateX(12px); }
+}
+@keyframes si-toast-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes si-savebar-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.anim-overlay-in { animation: si-overlay-in 150ms var(--ease-standard) both; }
+.anim-overlay-out { animation: si-overlay-out 130ms var(--ease-standard) both; }
+.anim-panel-in { animation: si-panel-in 200ms var(--ease-premium) both; }
+.anim-panel-out { animation: si-panel-out 130ms var(--ease-standard) both; }
+.anim-menu-in {
+  animation: si-menu-in 140ms var(--ease-premium) both;
+  transform-origin: var(--menu-origin, top right);
+}
+.anim-drawer-in { animation: si-drawer-in 220ms var(--ease-premium) both; }
+.anim-drawer-out { animation: si-drawer-out 150ms var(--ease-standard) both; }
+.anim-toast-in { animation: si-toast-in 200ms var(--ease-premium) both; }
+.anim-savebar-in { animation: si-savebar-in 200ms var(--ease-premium) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  [class*="anim-"] {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
