@@ -7,6 +7,7 @@ import { getTaxonomy } from "@/lib/taxonomy-store";
 import type { NotificationChannel } from "@/lib/types";
 import { sendNotificationEmail } from "@/lib/notifications/email";
 import { escapeSlackText, sendSlackMessage, type SlackMessage } from "@/lib/notifications/slack";
+import { splitQuotedText } from "@/lib/replies/quotes";
 
 export type ReplyNotification = {
   proposalId: string | null;
@@ -18,6 +19,9 @@ export type ReplyNotification = {
   campaignName: string | null;
   summary: string | null;
   nextStep: string | null;
+  /** Plain text of the reply itself (may still contain quoted history —
+      stripped at render time). Optional: older queued payloads lack it. */
+  replyText?: string | null;
   /** True when the pipeline already applied the proposal (pure out-of-office). */
   autoApplied: boolean;
   /**
@@ -109,10 +113,28 @@ export function formatEmailNotification(n: ReplyNotification) {
   return { subject, text: textLines.join("\n").trim(), html };
 }
 
+const REPLY_QUOTE_CAP = 1200;
+
+/** The lead's own words — quoted history stripped, capped, mrkdwn-quoted.
+    Null when nothing remains (e.g. a reply that was pure quoted thread). */
+function slackReplyQuote(replyText: string): string | null {
+  const visible = splitQuotedText(replyText).visible.trim();
+  if (!visible) return null;
+  const clipped = visible.length > REPLY_QUOTE_CAP ? `${visible.slice(0, REPLY_QUOTE_CAP).trimEnd()}…` : visible;
+  const quoted = escapeSlackText(clipped)
+    .split("\n")
+    .map((line) => (line ? `> ${line}` : ">"))
+    .join("\n");
+  // Slack hard-caps a section's text at 3000 chars; escaping can expand it.
+  return quoted.length > 2900 ? `${quoted.slice(0, 2900)}…` : quoted;
+}
+
 export function formatSlackNotification(n: ReplyNotification): SlackMessage {
   const emoji =
     n.category.sentimentType === "positive" ? "🟢" : n.category.sentimentType === "negative" ? "🔴" : "⚪";
   const headline = `${emoji} *${escapeSlackText(n.category.label)}*: ${escapeSlackText(leadLine(n))}${n.autoApplied ? " _(handled automatically)_" : ""}`;
+
+  const replyQuote = n.replyText ? slackReplyQuote(n.replyText) : null;
 
   const detailLines = [
     n.summary ? escapeSlackText(n.summary) : "",
@@ -129,6 +151,9 @@ export function formatSlackNotification(n: ReplyNotification): SlackMessage {
       ? [{ type: "context", elements: [{ type: "mrkdwn", text: `🔁 *${FOLLOW_UP_TAG}*` }] }]
       : []),
     { type: "section", text: { type: "mrkdwn", text: headline } },
+    ...(replyQuote
+      ? [{ type: "section", text: { type: "mrkdwn", text: `*They wrote:*\n${replyQuote}` } }]
+      : []),
     ...(detailLines.length
       ? [{ type: "section", text: { type: "mrkdwn", text: detailLines.join("\n") } }]
       : []),
@@ -288,6 +313,7 @@ export async function buildTestNotification(): Promise<ReplyNotification> {
     campaignName: "Test notification",
     summary: "This is a test notification from your inbox. The channel is wired up correctly.",
     nextStep: "Nothing to do. Real replies will look like this.",
+    replyText: "Thanks for reaching out — this caught my eye. Could you send over a bit more detail on pricing?\n\nBest,\nTest",
     autoApplied: false,
     followUpOnPositive: false,
   };

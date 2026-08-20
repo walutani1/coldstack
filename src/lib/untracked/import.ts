@@ -89,7 +89,8 @@ export async function processImportedReplyEvent(eventId: string): Promise<{ ok: 
     proposalId: inserted.data.id, campaignId: event.campaign_id, category: categoryDef,
     leadName: leadName || "Recovered contact", leadEmail: event.from_email, company,
     campaignName: event.campaign_name, summary: `Recovered reply: ${extraction.summary}`,
-    nextStep: extraction.next_step, autoApplied: false, followUpOnPositive: alreadyPositive,
+    nextStep: extraction.next_step, replyText: latestReply,
+    autoApplied: false, followUpOnPositive: alreadyPositive,
   });
   return { ok: true, proposalId: inserted.data.id as string };
 }

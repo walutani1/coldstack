@@ -362,6 +362,7 @@ export async function processReplyEvent(
       campaignName: event.campaign_name,
       summary: extraction.summary,
       nextStep: extraction.next_step,
+      replyText: latestReply,
       autoApplied: false,
       followUpOnPositive: alreadyPositive,
     });
